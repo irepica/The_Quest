@@ -1,3 +1,3 @@
 # The_Quest
 
-Crear juego. 
+Creación del juego The Quest. 
