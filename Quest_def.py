@@ -9,13 +9,16 @@ NEGRO = (0, 0, 0)
 
 
 
-#Definimos la primera clase --> Asteroide
+#Defino la primera clase --> Asteroide
 class Meteor(pg.sprite.Sprite):
     
     def __init__(self):
         super().__init__()
 
         self.speed_x = random.randint(-10,-1)
+
+
+        #Creo 3 asteroides de diferente tamaño
 
         randAst = random.randint(1,3)
         if randAst == 1:        
@@ -33,7 +36,7 @@ class Meteor(pg.sprite.Sprite):
 
 
 
-#Definimos la clase Player, que es la nave
+#Defino la clase Player, que es la nave
 class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -48,9 +51,10 @@ class Player(pg.sprite.Sprite):
 
     def changespeed(self, y):  
         self.speed_y += y
-        
+            
     def update(self):
-          
+        #Mediante límites, controlo que la nave no desaparezca de la pantalla
+
         if self.speed_y > 0:
             if (self.rect.y + self.speed_y) <= 550:
                 self.rect.y += self.speed_y
@@ -66,7 +70,7 @@ class Player(pg.sprite.Sprite):
         player.rect.x = 10
 
     def resetSpeed(self):
-        self.speed_y = 0
+        self.speed_y = 0  # Paro la nave 
     
     def borrar (self):
         self.kill()
@@ -74,7 +78,7 @@ class Player(pg.sprite.Sprite):
      
     
 
-class Explosion(pg.sprite.Sprite):
+class Explosion(pg.sprite.Sprite): 
     def __init__(self,center):
         
         pg.sprite.Sprite.__init__(self)
@@ -86,13 +90,13 @@ class Explosion(pg.sprite.Sprite):
         self.last_update = pg.time.get_ticks()
         self.frame_rate = 50
 
-    def update(self):
+    def update(self): # Para borrar el objeto de la explosión
         self.frame += 1
         if self.frame == 5:
             self.kill()
 
 
-#Definimos la clase Planeta fin de nivel
+#Defino la clase Planeta fin de nivel
 class Planeta(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -107,7 +111,7 @@ class Planeta(pg.sprite.Sprite):
     def changespeed(self, y):  
         self.speed_y += y
         
-    def update(self):
+    def update(self):  # Para generar el movimiento del planeta
         if self.rect.x >600:  
                 self.rect.x += self.speed_x
 
@@ -119,11 +123,7 @@ class Planeta(pg.sprite.Sprite):
 
 def menuInicio(baseD):
     iniciarMenu = False  
-    #window.fill(black)
-    #myfont=pg.font.SysFont("Britannic Bold", 40)
     
-    #nlabel=myfont.render("Welcome Start Screen", 1, (255, 0, 0))    #texto
-
     fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pantalla
     background = pg.image.load("Fondo_espacio.jpg").convert()
     screen.blit(background, [0, 0])
@@ -155,25 +155,18 @@ def menuInicio(baseD):
     listaBD = baseD.fetchall()
     print(listaBD)
      
-  
-
     texto = fuente.render("RECORDS", True, BLANCO)
     
     fila = 50
     screen.blit(texto, [500, fila])
-    for row in listaBD:
+    for row in listaBD:  # Muestro en la pantalla inicial los records acumulados en la base de datos
         fila +=20
         print(row[0])
         print(row[1])
         texto = fuente.render("FECHA: " + row[0] + " Puntos: " + str(row[1]) , True, BLANCO)
         screen.blit(texto, [500, fila])
 
-
     pg.display.flip()
-
-
-    
-
 
     while (iniciarMenu == False):
         for event in pg.event.get():
@@ -202,24 +195,11 @@ fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pa
 
 num_fotogramas = 0
 tasa_fotogramas = 30
-#instante_de_partida = 90
-#masMet = instante_de_partida - 3
-
-#puntos = 0
-
-#meteor_list = pg.sprite.Group()
-#all_sprite_list = pg.sprite.Group()
 
 ##SQLITE
 con = sqlite3.connect(":memory:")
 cur = con.cursor()
 cur.execute("create table tablaPuntos (nombre, puntos)")
-# This is the qmark style:
-#cur.execute("insert into tablaPuntos values (?, ?)", ("C", 1972))
-
-#cur.execute("insert into tablaPuntos values ("Pepe", 20)")
-
-# And this is the named style:
 
 
 sound = pg.mixer.Sound("explota.wav") #Variable para añadir sonido de explosión
@@ -305,10 +285,7 @@ while not done:
             screen.blit(texto, [150,300])
             victoria = True   
 
-    
-  
-    
-      
+         
 
     # Dividimos por 60 para obtener los minutos totales:
     if muerto == False:
