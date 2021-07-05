@@ -23,10 +23,6 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect() 
 
 
-
-
-
-
 pg.init()
 
 screen = pg.display.set_mode([800, 600])
@@ -58,9 +54,15 @@ while not done:
         if event.type == pg.QUIT:
             done = True
 
+    #Para mover la nave con el ratón
+    pg.mouse.set_visible(0)
     mouse_pos = pg.mouse.get_pos()
     player.rect.x = mouse_pos[0]
     player.rect.y = mouse_pos[1]
+
+    # Para crear el movimiento de derecha a izqda de los asteroides
+    for meteor in meteor_list:
+        meteor.rect.x += -1
 
     meteor_hit_list = pg.sprite.spritecollide(player, meteor_list, True)
 
