@@ -3,16 +3,10 @@ import random
 import sqlite3
 from datetime import datetime
 
-from pygame.constants import KEYDOWN, KEYUP
-
 
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
-VERDE =(0, 255, 255)
-DARKGREEN = (34, 139, 34)
 
-SCREENWIDTH = 800
-SCREENHEIGHT = 600
 
 
 #Defino la primera clase --> Asteroide
@@ -123,51 +117,6 @@ class Planeta(pg.sprite.Sprite):
 
     def resetSpeed(self):
         self.speed_y = 0
-
-
-# Defino la clase del nombre del jugador
-
-class enterName:
-    def getKeyPress(self):
-        devuelve = 1
-        while (devuelve == 1):
-            for event in pg.event.get():
-                if event.type == KEYUP:
-                    if event.key >=32 and event.key <=126:
-                    #return event.key
-                        devuelve = 0
-                        return event.unicode
-                        
-                #else:
-                    #return False
-                #    return ""
-        return ""  
-    def getCharacter(self):
-        salir = False
-        #while (salir == False):
-            # Comprobación por si el jugador ha tecleado teclas tipo (Shift, Alt, Ctrl)
-        keyinput = pg.key.get_pressed()
-
-        character = "NULL"
-
-            # Get all the "Events" that have ocurred
-        pg.event.pump()
-        keyPress = self.getKeyPress()
-        pg.event.clear()
-
-            # If the user presses a key on the keyboard, then get the character
-            # Is the user presses the shift key while pressing another character then capitalise it
-            #if keyPress >= 32 and keyPress <= 126:
-            #if keyPress == 2:
-            #    if keyinput[K_LSHIFT]:
-            #       keyPress -= 32
-        if keyPress != "":
-            #character = chr(keyPress)
-            character = keyPress
-            salir = True
-            keyPress=""
-
-        return character
       
 
 
@@ -228,48 +177,6 @@ def menuInicio(baseD):
                 iniciarMenu = True
 
 
-#Función para preguntar el nombre al jugador
-
-def ask(question):
-    current_string = ""
-    #ask (question) -> answer
-    intNombre = enterName()
-    display_box(question + ": " + current_string)
-    while 1:
-        current_string += str(intNombre.getCharacter())
-        # show the full string while typing
-        display_box(question + ": " + current_string)
-    return current_string # this is the answer
-
-
-# The display_box puts the name entry box on screen and updates while typing
-
-def display_box(message):
-    "Print a message in a box in the middle of the screen"
-    left = (SCREENWIDTH / 2) - 156
-    top = ( SCREENHEIGHT / 2) + 4 
-    
-    pg.draw.rect(screen, DARKGREEN, (left, top, 320, 200))
-    screen.blit(fuente.render("New High Score!", True, VERDE), 
-                    (left + 90, top + 35))
-    screen.blit(fuente.render("Press return when done.", True, VERDE),
-                     (left + 51, top + 160))
-
-    pg.draw.rect(screen, NEGRO, (left + 39, top + 110, 240, 20))
-    pg.draw.rect(screen, BLANCO, (left + 38, top + 108, 244, 24), 1)
-
-    if len(message) !=0:
-        screen.blit(fuente.render(message, True, BLANCO), (left+42, top + 111))
-
-    pg.display.flip()
-
-
-
-
-
-
-
-
 pg.init()
 
 screen = pg.display.set_mode([800, 600])
@@ -302,11 +209,7 @@ screen.blit(background, [0, 0])
 
 pg.key.set_repeat(5,100) # Para acelerar la nave al mantener pulsado el cursor
 
-nombre = ""
-
-while not done:
-    
-    ask(nombre)
+while not done: 
     
     #Llamada a menu inicio
     while inicio == True:
