@@ -46,7 +46,7 @@ class Meteor(pg.sprite.Sprite):
 class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.image.load("Nave_95.png").convert() # self.image es el nombre de la variable asteroide
+        self.image = pg.image.load("Nave_95.png").convert()
         self.image.set_colorkey(NEGRO)
         self.rect = self.image.get_rect() 
         self.speed_x = 0
@@ -54,6 +54,8 @@ class Player(pg.sprite.Sprite):
         self.rect.y = 300   #posicion inicial de la nave, centrada en altura
         self.angle = 0
         self.change_angle = 0
+        self.rotacionNave = 0
+        self.imagenOriginal = self.image.copy()
 
     def changespeed(self, y):  
         self.speed_y += y
@@ -80,6 +82,28 @@ class Player(pg.sprite.Sprite):
     
     def borrar (self):
         self.kill()
+
+    def rotarNave (self):
+        #while (self.rotacionNave < 180):        
+            #if self.rotacionNave < 180:
+        #self.rotacionNave += 1
+        self.angle +=1
+        self.image = pg.transform.rotate(self.imagenOriginal , self.angle)
+        #playerCopia = self.image.copy()
+        x,y = self.rect.center
+        self.rect = self.image.get_rect()
+        self.rect.center = (x,y)
+        #self.surf = pg.transform.rotate(playerCopia, self.angle)
+        #self.rect = self.surf.get_rect(center=self.rect.center)    
+        
+
+        ##playerCopia = pg.transform.rotate(playerCopia, self.rotacionNave)
+            
+        ##screen.blit(playerCopia, (self.rect.x, self.rect.y))
+            
+        #self.image = playerCopia
+            #pg.display.update()  
+
  
      
     
@@ -305,8 +329,8 @@ pg.key.set_repeat(5,100) # Para acelerar la nave al mantener pulsado el cursor
 nombre = ""
 
 while not done:
-    
-    ask(nombre)
+    #Introducir iniciales
+    #ask(nombre)
     
     #Llamada a menu inicio
     while inicio == True:
@@ -327,6 +351,8 @@ while not done:
         numMeteoritos = 2
         reiniciar = False
         victoria = False
+        naveRotando = True
+        contarGiro = 0
         
         for i in range(2): # Creamos 2 asteroides
             meteor = Meteor()
@@ -363,7 +389,7 @@ while not done:
             #else:
                 #Fin de partida
             #Texto fin de nivel
- 
+        
     if finNivel == True and mostPlaneta == True:
         if mostPlaneta == True:
             cronometro += 1
@@ -371,12 +397,25 @@ while not done:
             if cronometro >= tiempoEspera:
                 mostPlaneta = False
     
-    if finNivel == True and mostPlaneta == False:
+    
+    
+    if finNivel == True and mostPlaneta == False and naveRotando == True:
+        player.rotarNave()
+        contarGiro +=1
+        if contarGiro > 180:
+            naveRotando = False
+
+    
+    if finNivel == True and mostPlaneta == False and naveRotando == False:
+        #player.rotarNave()
         if nivel <3:
             texto_salida = 'Nivel ' + str(nivel) + ' Finalizado!! PRESIONA ESPACIO PARA CONTINUAR' 
             texto = fuente.render(texto_salida, True, BLANCO)
             screen.blit(texto, [150,200])   
         else:
+
+            #player.rotarNave()
+
             texto_salida = 'Enhorabuena!! Has conseguido ' + str(puntos) + ' puntos!! PRESIONA ENTER PARA CONTINUAR' 
             texto = fuente.render(texto_salida, True, BLANCO)
             screen.blit(texto, [150,300])
@@ -508,7 +547,7 @@ while not done:
                         print(cur.fetchall())   
 
 
-    if finNivel == True and mostPlaneta == False and muerto == False and victoria == False:
+    if finNivel == True and mostPlaneta == False and muerto == False and victoria == False and naveRotando == False:
          #APRETEMOS ESPACIO PARA CONTINUAR
         while (finNivel == True):
             for event in pg.event.get():
