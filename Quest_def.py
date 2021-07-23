@@ -1,6 +1,7 @@
 import pygame as pg
 import random
 import sqlite3
+from sqlite3 import Error
 from datetime import datetime
 
 from pygame.constants import KEYDOWN, KEYUP
@@ -77,6 +78,7 @@ class Player(pg.sprite.Sprite):
                
         player.rect.x = 10
 
+
     def resetSpeed(self):
         self.speed_y = 0  # Paro la nave 
     
@@ -87,7 +89,7 @@ class Player(pg.sprite.Sprite):
         #while (self.rotacionNave < 180):        
             #if self.rotacionNave < 180:
         #self.rotacionNave += 1
-        self.angle +=1
+        self.angle +=3
         self.image = pg.transform.rotate(self.imagenOriginal , self.angle)
         #playerCopia = self.image.copy()
         x,y = self.rect.center
@@ -103,6 +105,9 @@ class Player(pg.sprite.Sprite):
             
         #self.image = playerCopia
             #pg.display.update()  
+
+    #def aterrizar(self):
+
 
  
      
@@ -238,7 +243,7 @@ def menuInicio(baseD):
         fila +=20
         print(row[0])
         print(row[1])
-        texto = fuente.render("FECHA: " + row[0] + " Puntos: " + str(row[1]) , True, BLANCO)
+        texto = fuente.render("FECHA: " + row[1] + " Puntos: " + str(row[2]) , True, BLANCO)
         screen.blit(texto, [500, fila])
 
     pg.display.flip()
@@ -259,7 +264,8 @@ def ask(question):
     #ask (question) -> answer
     intNombre = enterName()
     display_box(question + ": " + current_string)
-    while 1:
+    #while 1:
+    for x in [1,1,1]:
         current_string += str(intNombre.getCharacter())
         # show the full string while typing
         display_box(question + ": " + current_string)
@@ -290,10 +296,6 @@ def display_box(message):
 
 
 
-
-
-
-
 pg.init()
 
 screen = pg.display.set_mode([800, 600])
@@ -313,10 +315,45 @@ fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pa
 num_fotogramas = 0
 tasa_fotogramas = 30
 
+#############################################
 ##SQLITE
-con = sqlite3.connect(":memory:")
+#########################################
+
+con = sqlite3.connect("mydatabase.db")
 cur = con.cursor()
-cur.execute("create table tablaPuntos (nombre, puntos)")
+cur.execute("create table if not exists tablaPuntos (id, nombre, puntos)")
+
+'''def sql_connection():
+    try:
+
+        con = sqlite3.connect("mydatabase.db")
+
+        return con
+
+    except Error:
+        print (Error)
+
+def sql_table(con):
+
+    cur = con.cursor()
+
+    cur.execute("CREATE TABLE if not exists tablaPuntos (nombre, puntos)")
+
+
+    con.commit()
+
+con = sql_connection()
+
+sql_table(con)'''
+
+
+
+
+
+
+
+
+
 
 
 sound = pg.mixer.Sound("explota.wav") #Variable para añadir sonido de explosión
@@ -330,8 +367,8 @@ nombre = ""
 
 while not done:
     #Introducir iniciales
-    #ask(nombre)
     
+    print(nombre)
     #Llamada a menu inicio
     while inicio == True:
         menuInicio(cur)
@@ -400,10 +437,11 @@ while not done:
     
     
     if finNivel == True and mostPlaneta == False and naveRotando == True:
+        contarGiro +=3
         player.rotarNave()
-        contarGiro +=1
-        if contarGiro > 180:
+        if contarGiro > 177:
             naveRotando = False
+            contarGiro = 0
 
     
     if finNivel == True and mostPlaneta == False and naveRotando == False:
@@ -459,7 +497,7 @@ while not done:
     #Pintar marcador
     texto_salida = '  Puntos ' + str(puntos) + '                   Nivel ' + str(nivel)
     texto = fuente.render(texto_salida, True, BLANCO)
-    screen.blit(texto, [20,10])   
+    screen.blit(texto, [15,10])   
     
     if finNivel == False:
         for event in pg.event.get():
@@ -513,9 +551,12 @@ while not done:
             muerto = True
     
     if muerto == True:
-        texto_salida = 'GAME OVER PRESIONE ENTER PARA CONTINUAR' 
+        texto_salida = 'GAME OVER'
+        texto_salida_2 = 'PRESIONE ENTER PARA CONTINUAR' 
         texto = fuente.render(texto_salida, True, BLANCO)
-        screen.blit(texto, [150,200])
+        texto2 = fuente.render(texto_salida_2, True, BLANCO)
+        screen.blit(texto, [120,270])
+        screen.blit(texto2, [120, 300])
 
     all_sprite_list.draw(screen)
     pg.display.flip()
@@ -541,10 +582,38 @@ while not done:
                         #guardar puntuacion
                         now=datetime.now()
                         date_timeSQL = now.strftime("%d/%m/%Y , %H:%M:%S")
-                        cur.execute("insert into tablaPuntos values (?, ?)", (date_timeSQL,puntos))
+                        
+                        cur.execute("select count(*) from tablaPuntos")
+                        numFilas = int(cur.fetchone()[0])
+
                         print(date_timeSQL)
-                        cur.execute("select * from tablaPuntos") #recuperar lista ordenada por los puntos
-                        print(cur.fetchall())   
+                        if numFilas > 0:
+                            cur.execute("select puntos from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
+                            minPuntos = cur.fetchone()[0]
+                            cur.execute("select id from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
+                            idBorrar = cur.fetchone()[0]
+                            QUERYBORRAR = "delete from tablaPuntos where id =" + str(idBorrar)
+                            print(cur.fetchall())
+                            print("minPuntos = " + str(minPuntos))   
+
+                        
+                        if numFilas < 5:
+                            nombre=ask("nombre")
+                            cur.execute("insert into tablaPuntos values (?,?,?)", (numFilas+1,nombre,puntos))
+                            con.commit()
+                            print(numFilas+10)
+                        elif minPuntos <= puntos:
+                            nombre=ask("nombre")
+                            #cur.execute("delete from tablaPuntos where id in (select id from tablaPuntos order by puntos ASC limit 1)")
+                            cur.execute(QUERYBORRAR)
+                            cur.execute("insert into tablaPuntos values (?,?,?)", (idBorrar,nombre,puntos))
+                            con.commit()
+                            print(numFilas)
+
+
+
+
+
 
 
     if finNivel == True and mostPlaneta == False and muerto == False and victoria == False and naveRotando == False:
