@@ -255,7 +255,7 @@ def menuInicio(baseD):
     #SQL
     baseD.execute("select * from tablaPuntos") #recuperar lista ordenada por los puntos
     listaBD = baseD.fetchall()
-    print(listaBD)
+    #print(listaBD)
      
     texto = fuente.render("RECORDS", True, BLANCO)
     
@@ -263,8 +263,8 @@ def menuInicio(baseD):
     screen.blit(texto, [500, fila])
     for row in listaBD:  # Muestro en la pantalla inicial los records acumulados en la base de datos
         fila +=20
-        print(row[0])
-        print(row[1])
+        #print(row[0])
+        #print(row[1])
         texto = fuente.render("FECHA: " + row[1] + " Puntos: " + str(row[2]) , True, BLANCO)
         screen.blit(texto, [500, fila])
 
@@ -609,35 +609,35 @@ while not done:
                         all_sprite_list.empty()
                         
                         #guardar puntuacion
-                        now=datetime.now()
-                        date_timeSQL = now.strftime("%d/%m/%Y , %H:%M:%S")
+                        #now=datetime.now()
+                        #date_timeSQL = now.strftime("%d/%m/%Y , %H:%M:%S")
                         
                         cur.execute("select count(*) from tablaPuntos")
                         numFilas = int(cur.fetchone()[0])
 
-                        print(date_timeSQL)
+                        #print(date_timeSQL)
                         if numFilas > 0:
                             cur.execute("select puntos from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
                             minPuntos = cur.fetchone()[0]
                             cur.execute("select id from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
                             idBorrar = cur.fetchone()[0]
                             QUERYBORRAR = "delete from tablaPuntos where id =" + str(idBorrar)
-                            print(cur.fetchall())
-                            print("minPuntos = " + str(minPuntos))   
+                            #print(cur.fetchall())
+                            #print("minPuntos = " + str(minPuntos))   
 
                         
                         if numFilas < 5:
                             nombre=ask("nombre")
                             cur.execute("insert into tablaPuntos values (?,?,?)", (numFilas+1,nombre,puntos))
                             con.commit()
-                            print(numFilas+10)
+                            #print(numFilas+10)
                         elif minPuntos <= puntos:
                             nombre=ask("nombre")
                             #cur.execute("delete from tablaPuntos where id in (select id from tablaPuntos order by puntos ASC limit 1)")
                             cur.execute(QUERYBORRAR)
                             cur.execute("insert into tablaPuntos values (?,?,?)", (idBorrar,nombre,puntos))
                             con.commit()
-                            print(numFilas)
+                            #print(numFilas)
 
 
 
@@ -661,6 +661,7 @@ while not done:
                         nivel += 1
                         finNivel = False
                         numMeteoritos += 3
+                        naveRotando = True
                         
                         for i in range(numMeteoritos): # Creamos 2 asteroides
                             meteor = Meteor()
