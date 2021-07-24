@@ -57,6 +57,8 @@ class Player(pg.sprite.Sprite):
         self.change_angle = 0
         self.rotacionNave = 0
         self.imagenOriginal = self.image.copy()
+        self.Aterrizar = False
+        self.rect.x = 10
 
     def changespeed(self, y):  
         self.speed_y += y
@@ -76,11 +78,27 @@ class Player(pg.sprite.Sprite):
             else:
                 self.rect.y = 5
                
-        player.rect.x = 10
+        if self.Aterrizar == True:
+            
+            if self.rect.y >= 310: 
+                self.speed_y= -10
+            elif self.rect.y <= 290:
+                self.speed_y= 10
+            else:
+                self.speed_y=0
+                self.rect.x += 30
+            
+
+            if self.rect.x >500:
+                self.speed_x=0
+                self.Aterrizar = False
+
+            
 
 
     def resetSpeed(self):
-        self.speed_y = 0  # Paro la nave 
+        if self.Aterrizar == False:
+            self.speed_y = 0  # Paro la nave 
     
     def borrar (self):
         self.kill()
@@ -106,7 +124,11 @@ class Player(pg.sprite.Sprite):
         #self.image = playerCopia
             #pg.display.update()  
 
-    #def aterrizar(self):
+    def aterrizar (self):
+        self.Aterrizar = True
+        if self.rect.x >=500:
+            self.Aterrizar = False
+            return True
 
 
  
@@ -141,7 +163,7 @@ class Planeta(pg.sprite.Sprite):
         self.speed_x = -3
         self.speed_y = 0
         self.rect.x = 800
-        self.rect.y = 0   #posicion inicial de la nave, centrada en altura
+        self.rect.y = 50   #posicion inicial de la nave, centrada en altura
 
     def changespeed(self, y):  
         self.speed_y += y
@@ -390,6 +412,7 @@ while not done:
         victoria = False
         naveRotando = True
         contarGiro = 0
+        aterrizar = False
         
         for i in range(2): # Creamos 2 asteroides
             meteor = Meteor()
@@ -437,10 +460,16 @@ while not done:
     
     
     if finNivel == True and mostPlaneta == False and naveRotando == True:
-        contarGiro +=3
-        player.rotarNave()
-        if contarGiro > 177:
+        if contarGiro < 177:
+            contarGiro +=3
+            player.rotarNave()
+        elif contarGiro >= 177:
+            #naveRotando = False
+            aterrizar = True
+            
+        if aterrizar == True and player.aterrizar():
             naveRotando = False
+            aterrizar = False
             contarGiro = 0
 
     
