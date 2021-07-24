@@ -252,7 +252,7 @@ def menuInicio(baseD):
     texto = fuente.render("Presiona la tecla 'espacio' y empieza la aventura!", True, BLANCO)
     screen.blit(texto, [400, 550])
     
-    #SQL
+    '''#SQL
     baseD.execute("select * from tablaPuntos") #recuperar lista ordenada por los puntos
     listaBD = baseD.fetchall()
     #print(listaBD)
@@ -267,7 +267,7 @@ def menuInicio(baseD):
         #print(row[1])
         texto = fuente.render("FECHA: " + row[1] + " Puntos: " + str(row[2]) , True, BLANCO)
         screen.blit(texto, [500, fila])
-
+    '''
     pg.display.flip()
 
     while (iniciarMenu == False):
@@ -302,8 +302,12 @@ def display_box(message):
     top = ( SCREENHEIGHT / 2) + 4 
     
     pg.draw.rect(screen, DARKGREEN, (left, top, 320, 200))
-    screen.blit(fuente.render("New High Score!", True, VERDE), 
+    screen.blit(fuente.render("¡Nuevo record conseguido!", True, VERDE), 
                     (left + 90, top + 35))
+
+    #screen.blit(fuente.render("'Por favor, introduce las iniciales de tu nombre", True, VERDE)
+    #                left )
+
     screen.blit(fuente.render("Press return when done.", True, VERDE),
                      (left + 51, top + 160))
 
@@ -315,8 +319,44 @@ def display_box(message):
 
     pg.display.flip()
 
+def mostrarRecords(baseD):
+    baseD.execute("select * from tablaPuntos") #recuperar lista ordenada por los puntos
+    listaBD = baseD.fetchall()
+    #print(listaBD)
+     
+    texto = fuente.render("RECORDS", True, BLANCO)
+    
+    fila = 50
+    screen.blit(texto, [500, fila])
+    for row in listaBD:  # Muestro en la pantalla inicial los records acumulados en la base de datos
+        fila +=20
+        #print(row[0])
+        #print(row[1])
+        texto = fuente.render("FECHA: " + row[1] + " Puntos: " + str(row[2]) , True, BLANCO)
+        screen.blit(texto, [500, fila])    
 
+def nuevoRecord(baseD, puntos):
+    baseD.execute("select count(*) from tablaPuntos")
+    numFilas = int(baseD.fetchone()[0])
 
+ 
+    if numFilas > 0:
+        baseD.execute("select puntos from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
+        minPuntos = baseD.fetchone()[0]
+        baseD.execute("select id from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
+        idBorrar = baseD.fetchone()[0]
+        QUERYBORRAR = "delete from tablaPuntos where id =" + str(idBorrar)
+             
+    if numFilas < 5:
+        nombre=ask("nombre")
+        baseD.execute("insert into tablaPuntos values (?,?,?)", (numFilas+1,nombre,puntos))
+        
+    elif minPuntos <= puntos:
+        nombre=ask("nombre")
+        baseD.execute(QUERYBORRAR)
+        baseD.execute("insert into tablaPuntos values (?,?,?)", (idBorrar,nombre,puntos))
+        
+                   
 
 pg.init()
 
@@ -483,9 +523,15 @@ while not done:
 
             #player.rotarNave()
 
-            texto_salida = 'Enhorabuena!! Has conseguido ' + str(puntos) + ' puntos!! PRESIONA ENTER PARA CONTINUAR' 
+            texto_salida = '¡¡Enhorabuena!! ¡¡Has conseguido ' + str(puntos) + ' puntos!!  '
             texto = fuente.render(texto_salida, True, BLANCO)
             screen.blit(texto, [150,300])
+
+            texto_salida = 'PRESIONA ENTER PARA CONTINUAR'
+            texto = fuente.render(texto_salida, True, BLANCO)
+            screen.blit(texto, [150, 300])
+        
+
             victoria = True   
 
          
@@ -580,6 +626,9 @@ while not done:
             muerto = True
     
     if muerto == True:
+        nuevoRecord(cur, puntos)
+        con.commit()
+        mostrarRecords(cur)
         texto_salida = 'GAME OVER'
         texto_salida_2 = 'PRESIONE ENTER PARA CONTINUAR' 
         texto = fuente.render(texto_salida, True, BLANCO)
@@ -596,7 +645,7 @@ while not done:
         reiniciar = True
        
     if reiniciar == True:
-         #APRETEMOS ESPACIO PARA CONTINUAR
+         #APRETAMOS ESPACIO PARA CONTINUAR
         while (reiniciar == True):
              for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -612,32 +661,7 @@ while not done:
                         #now=datetime.now()
                         #date_timeSQL = now.strftime("%d/%m/%Y , %H:%M:%S")
                         
-                        cur.execute("select count(*) from tablaPuntos")
-                        numFilas = int(cur.fetchone()[0])
-
-                        #print(date_timeSQL)
-                        if numFilas > 0:
-                            cur.execute("select puntos from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
-                            minPuntos = cur.fetchone()[0]
-                            cur.execute("select id from tablaPuntos order by puntos ") #recuperar lista ordenada por los puntos
-                            idBorrar = cur.fetchone()[0]
-                            QUERYBORRAR = "delete from tablaPuntos where id =" + str(idBorrar)
-                            #print(cur.fetchall())
-                            #print("minPuntos = " + str(minPuntos))   
-
                         
-                        if numFilas < 5:
-                            nombre=ask("nombre")
-                            cur.execute("insert into tablaPuntos values (?,?,?)", (numFilas+1,nombre,puntos))
-                            con.commit()
-                            #print(numFilas+10)
-                        elif minPuntos <= puntos:
-                            nombre=ask("nombre")
-                            #cur.execute("delete from tablaPuntos where id in (select id from tablaPuntos order by puntos ASC limit 1)")
-                            cur.execute(QUERYBORRAR)
-                            cur.execute("insert into tablaPuntos values (?,?,?)", (idBorrar,nombre,puntos))
-                            con.commit()
-                            #print(numFilas)
 
 
 
