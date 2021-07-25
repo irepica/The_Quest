@@ -44,6 +44,11 @@ class Meteor(pg.sprite.Sprite):
     
     def update(self):
         self.rect.x += self.speed_x
+        if self.rect.x <= -50:
+            print("meteorito kill")
+            self.kill()
+    def killme():
+        self.kill()
 
 
 
@@ -241,7 +246,7 @@ def menuInicio(baseD):
     pg.display.set_caption("The Quest, Sobrevive a la Tormenta de Asteroides")
     screen.blit(texto, [25, 20])
 
-    fuente = pg.font.Font("fuentes/texto.otf", 19)
+    fuente = pg.font.Font("fuentes/texto.otf", 18)
 
     texto = fuente.render("Coloniza nuevos planetas, esquivando un campo de asteroides", True, BLANCO)
     screen.blit(texto, [10, 100])
@@ -255,11 +260,11 @@ def menuInicio(baseD):
     texto = fuente.render("Pulsa los cursores superior e inferior, para mover la nave ", True, BLANCO)
     screen.blit(texto, [10, 465])
 
-    texto = fuente.render("Dispones de 3 vidas para ello!", True, BLANCO)
+    texto = fuente.render("Dispones de 3 vidas para ello", True, BLANCO)
     screen.blit(texto, [10, 140])
 
-    texto = fuente.render("Presiona la tecla 'espacio' y empieza la aventura!", True, BLANCO)
-    screen.blit(texto, [200, 550])
+    texto = fuente.render("Pulsa la tecla 'espacio' y empieza la aventura", True, BLANCO)
+    screen.blit(texto, [140, 550])
     
     
     pg.display.flip()
@@ -286,7 +291,7 @@ def ask(question):
         current_string += str(intNombre.getCharacter())
         # show the full string while typing
         display_box(question + ": " + current_string)
-    pg.time.wait(1000)
+    pg.time.wait(500)
     return current_string # this is the answer
 
 
@@ -297,28 +302,31 @@ def display_box(message):
     left = (SCREENWIDTH / 2) - 156
     top = ( SCREENHEIGHT / 2) + 4 
     
-    pg.draw.rect(screen, GREY, (left, top, 320, 200))
-    fuente = pg.font.Font("fuentes/texto.otf", 12)
-    screen.blit(fuente.render("¡Nuevo record conseguido!", True, NEGRO), 
-                    (left + 80, top + 35))
+    #pg.draw.rect(screen, GREY, (left, top, 320, 200))
+    #fuente = pg.font.Font("fuentes/texto.otf", 12)
+    #screen.blit(fuente.render("¡Nuevo record conseguido!", True, NEGRO), 
+    #                (left + 80, top + 35))
+    fuente = pg.font.Font("fuentes/titulo.otf", 36)
+    screen.blit(fuente.render("¡Nuevo récord conseguido!", True, BLANCO),(80, 250))
 
     #screen.blit(fuente.render("'Por favor, introduce las iniciales de tu nombre", True, VERDE)
      #               (left + 80, TOP + 50))
 
-    screen.blit(fuente.render("Pulsa ENTER para finalizar.", True, NEGRO),
-                     (left + 51, top + 160))
+    #screen.blit(fuente.render("Pulsa ENTER para finalizar.", True, NEGRO),
+    #                 (left + 51, top + 160))
 
     #pg.draw.rect(screen, NEGRO, (left + 39, top + 110, 240, 20))
-    pg.draw.rect(screen, NEGRO, (left + 39, top + 110, 90, 20))
-    pg.draw.rect(screen, BLANCO, (left + 38, top + 108, 90, 24), 1)
+    pg.draw.rect(screen, NEGRO, (left + 39, top + 110, 180, 20))
+    pg.draw.rect(screen, BLANCO, (left + 38, top + 108, 180, 24), 1)
 
+    fuente = pg.font.Font("fuentes/titulo.otf", 18)
     if len(message) !=0:
         screen.blit(fuente.render(message, True, BLANCO), (left+42, top + 111))
 
     pg.display.flip()
 
 def mostrarRecords(baseD, tipo):
-    baseD.execute("select * from tablaPuntos") #recuperar lista ordenada por los puntos
+    baseD.execute("select * from tablaPuntos order by puntos desc") #recuperar lista ordenada por los puntos
     listaBD = baseD.fetchall()
     #print(listaBD)
     fuente = pg.font.Font("fuentes/texto.otf", 18) 
@@ -546,9 +554,7 @@ while not done:
             #compruebo records y pido inciales
             nuevoRecord(cur, puntos)
             con.commit()
-            #mostrarRecords(cur)
-        
-        
+            #mostrarRecords(cur)       
 
         all_sprite_list.draw(screen)
         pg.display.flip()
@@ -616,9 +622,9 @@ while not done:
        
         if finNivel == True:    
             if nivel <3:
-                texto_salida = 'Nivel ' + str(nivel) + ' Finalizado!! PRESIONA ESPACIO PARA CONTINUAR' 
+                texto_salida = '¡¡Nivel ' + str(nivel) + ' Finalizado!! PULSA ESPACIO PARA CONTINUAR' 
                 texto = fuente.render(texto_salida, True, BLANCO)
-                screen.blit(texto, [150,150])
+                screen.blit(texto, [100,400])
                 pg.display.flip()
             #if finNivel == True and mostPlaneta == False and muerto == False and victoria == False and naveRotando == False:
         
@@ -641,6 +647,7 @@ while not done:
                             faseFinal = False
                             pausaJuego= False
                             inicioNivel = True
+                            meteor_list.empty()
 
                             '''
                             for i in range(numMeteoritos): # Creamos 2 asteroides
@@ -668,7 +675,7 @@ while not done:
         texto = fuente2.render(texto_salida, True, BLANCO)
         screen.blit(texto, [50,90])
 
-        texto_salida = 'PRESIONA ENTER PARA CONTINUAR'
+        texto_salida = 'PULSA ENTER PARA CONTINUAR'
         texto = fuente.render(texto_salida, True, BLANCO)
         screen.blit(texto, [170, 500])
         pg.display.flip()
@@ -698,7 +705,7 @@ while not done:
         #con.commit()
         mostrarRecords(cur, "muerte")
         texto_salida = 'GAME OVER'
-        texto_salida_2 = 'PRESIONE ENTER PARA CONTINUAR' 
+        texto_salida_2 = 'PULSA ENTER PARA CONTINUAR' 
         texto = fuente.render(texto_salida, True, BLANCO)
         texto2 = fuente2.render(texto_salida_2, True, BLANCO)
         #screen.blit(texto, [120,285])
