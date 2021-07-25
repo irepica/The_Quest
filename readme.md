@@ -1,7 +1,9 @@
+
 # The_Quest
 
-Creación del juego The Quest.
+He escogido la creación del juego The Quest cómo proyecto final del Bootcamp.
 
 El nombre del archivo del juego es Quest_def.py
 
-No he creado el fichero "migrations", el valor de las puntuaciones se almacenan en la memoria. 
+He agrupado en las carpetas "Media" y " Fuentes" las imágenes, sonido y fuentes que he usado en mi programa.
+
