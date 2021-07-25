@@ -227,7 +227,7 @@ def menuInicio(baseD):
     iniciarMenu = False  
     
     fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pantalla
-    background = pg.image.load("Fondo_espacio.jpg").convert()
+    background = pg.image.load("nebula.jpeg").convert()
     screen.blit(background, [0, 0])
     
     texto = fuente.render("Bienvenido/a a The Quest", True, BLANCO)
@@ -274,7 +274,7 @@ def menuInicio(baseD):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 iniciarMenu = True
-                pg.quit()
+                pg.QUIT
             elif event.type == pg.KEYDOWN and event.key==pg.K_SPACE:
                 iniciarMenu = True
 
@@ -356,7 +356,9 @@ def nuevoRecord(baseD, puntos):
         baseD.execute(QUERYBORRAR)
         baseD.execute("insert into tablaPuntos values (?,?,?)", (idBorrar,nombre,puntos))
         
-                   
+def fondoJuego():
+    background = pg.image.load("Fondo_espacio.jpg").convert()
+    screen.blit(background, [0, 0])
 
 pg.init()
 
@@ -385,57 +387,27 @@ con = sqlite3.connect("mydatabase.db")
 cur = con.cursor()
 cur.execute("create table if not exists tablaPuntos (id, nombre, puntos)")
 
-'''def sql_connection():
-    try:
-
-        con = sqlite3.connect("mydatabase.db")
-
-        return con
-
-    except Error:
-        print (Error)
-
-def sql_table(con):
-
-    cur = con.cursor()
-
-    cur.execute("CREATE TABLE if not exists tablaPuntos (nombre, puntos)")
-
-
-    con.commit()
-
-con = sql_connection()
-
-sql_table(con)'''
-
-
-
-
-
-
-
-
-
-
 
 sound = pg.mixer.Sound("explota.wav") #Variable para añadir sonido de explosión
 
-background = pg.image.load("Fondo_espacio.jpg").convert()
-screen.blit(background, [0, 0])
+#background = pg.image.load("Fondo_espacio.jpg").convert()
+#screen.blit(background, [0, 0])
 
 pg.key.set_repeat(5,100) # Para acelerar la nave al mantener pulsado el cursor
 
 nombre = ""
 
 while not done:
-    #Introducir iniciales
-    
-    print(nombre)
+        
     #Llamada a menu inicio
     while inicio == True:
+        background = pg.image.load("nebula.jpeg").convert()
+        screen.blit(background, [0, 0])
         menuInicio(cur)
-        inicio = False
+        
         #Inicio variables
+        inicio = False
+        juego = True
         puntos = 0
         instante_de_partida = 10
         masMet = instante_de_partida - 3 #Cada cuanto se generan mas meteoritos (segundos)
@@ -450,152 +422,90 @@ while not done:
         numMeteoritos = 2
         reiniciar = False
         victoria = False
-        naveRotando = True
+        naveRotando = False
         contarGiro = 0
         aterrizar = False
-        
-        for i in range(2): # Creamos 2 asteroides
-            meteor = Meteor()
-            #meteor.rect.x = random.randrange(800)
-            meteor.rect.x = 700 #TOdos empiezan en el margen derecho
-            meteor.rect.y = random.randint(50,580)
-            meteor_list.add(meteor)
-            all_sprite_list.add(meteor)
-        player = Player()
-        all_sprite_list.add(player)
-
-
-    #control tiempo
-    screen.blit(background, [0, 0])
-    
-    if finNivel == False and mostPlaneta == False and muerto == False:
-        #segundos_totales = instante_de_partida - (num_fotogramas // tasa_fotogramas)
-        segundos_totales = instante_de_partida - (cronometro // tasa_fotogramas)
-        cronometro += 1
-        if segundos_totales <0:
-            segundos_totales = 0
-           
-        if segundos_totales == 0:
-            mostPlaneta = True
-            finNivel = True
-            plan = Planeta()
-            all_sprite_list.add(plan)
-            cronometro = 0
-            #Programar FIN DE PARTIDA!!!
-            #if nivel < 3:
-             #   nivel += 1
-                #instante_de_partida += 10
-                #masMet = instante_de_partida -3
-            #else:
-                #Fin de partida
-            #Texto fin de nivel
-        
-    if finNivel == True and mostPlaneta == True:
-        if mostPlaneta == True:
-            cronometro += 1
-            tiempoEspera = 3* tasa_fotogramas
-            if cronometro >= tiempoEspera:
-                mostPlaneta = False
-    
-    
-    
-    if finNivel == True and mostPlaneta == False and naveRotando == True:
-        if contarGiro < 177:
-            contarGiro +=3
-            player.rotarNave()
-        elif contarGiro >= 177:
-            #naveRotando = False
-            aterrizar = True
-            
-        if aterrizar == True and player.aterrizar():
-            naveRotando = False
-            aterrizar = False
-            contarGiro = 0
-
-    
-    if finNivel == True and mostPlaneta == False and naveRotando == False:
-        #player.rotarNave()
-        if nivel <3:
-            texto_salida = 'Nivel ' + str(nivel) + ' Finalizado!! PRESIONA ESPACIO PARA CONTINUAR' 
-            texto = fuente.render(texto_salida, True, BLANCO)
-            screen.blit(texto, [150,200])   
-        else:
-
-            #player.rotarNave()
-
-            texto_salida = '¡¡Enhorabuena!! ¡¡Has conseguido ' + str(puntos) + ' puntos!!  '
-            texto = fuente.render(texto_salida, True, BLANCO)
-            screen.blit(texto, [150,300])
-
-            texto_salida = 'PRESIONA ENTER PARA CONTINUAR'
-            texto = fuente.render(texto_salida, True, BLANCO)
-            screen.blit(texto, [150, 300])
+        duraNivel=10
+        segundos_totales = duraNivel
+        pausaJuego = False
+        inicioNivel = True
+        faseFinal = False
+       
         
 
-            victoria = True   
+    while juego == True:
+        fondoJuego()
+        if inicioNivel == True:
+            for i in range(2): # Creamos 2 asteroides
+                meteor = Meteor()
+                #meteor.rect.x = random.randrange(800)
+                meteor.rect.x = 700 #TOdos empiezan en el margen derecho
+                meteor.rect.y = random.randint(50,580)
+                meteor_list.add(meteor)
+                all_sprite_list.add(meteor)
+            inicioNivel = False
+            player = Player()
+            all_sprite_list.add(player)    
+        
+        
+        
+        #+meteoritos
+        if segundos_totales < masMet and pausaJuego == False:
+            masMet -= 3
+            puntos +=10 + (3*nivel)
+            for i in range(numMeteoritos): # Creamos 2 asteroides
+                meteor = Meteor()
+                #meteor.rect.x = random.randrange(800)
+                meteor.rect.x = 700 #TOdos empiezan en el margen derecho
+                meteor.rect.y = random.randint(50,580)
 
-         
+                meteor_list.add(meteor)
+                all_sprite_list.add(meteor)
 
-    # Dividimos por 60 para obtener los minutos totales:
-    if muerto == False:
+        # Dividimos por 60 para obtener los minutos totales:
+        #if pausaJuego == False:
         minutos = segundos_totales // 60
-
         segundos = segundos_totales % 60
-
         segundos5 = segundos_totales % 60
 
-    # Usamos el formato de cadenas de texto para formatear los ceros del principio
+        # Usamos el formato de cadenas de texto para formatear los ceros del principio
+        texto_salida = "Time: {0:02} : {1:02}".format(minutos, segundos)
 
-    texto_salida = "Time: {0:02} : {1:02}".format(minutos, segundos)
+        # Volcamos en la pantalla:
+        texto = fuente.render(texto_salida, True, BLANCO)
+        screen.blit(texto, [400,10])
+        num_fotogramas += 1 
 
-    # Volcamos en la pantalla:
-    texto = fuente.render(texto_salida, True, BLANCO)
-    screen.blit(texto, [400,10])
-
-    num_fotogramas += 1
-
-    
-    #Se añaden nuevos asteroides cada 3 segundos
-    if segundos_totales < masMet and finNivel == False:
-        masMet -= 3
-        puntos +=10 + (3*nivel)
-        for i in range(numMeteoritos): # Creamos 2 asteroides
-            meteor = Meteor()
-            #meteor.rect.x = random.randrange(800)
-            meteor.rect.x = 700 #TOdos empiezan en el margen derecho
-            meteor.rect.y = random.randint(50,580)
-
-            meteor_list.add(meteor)
-            all_sprite_list.add(meteor) 
-    
-    
-    #Pintar marcador
-    texto_salida = '  Puntos ' + str(puntos) + '                   Nivel ' + str(nivel)
-    texto = fuente.render(texto_salida, True, BLANCO)
-    screen.blit(texto, [15,10])   
-    
-    if finNivel == False:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                done = True
-
-        # EVENTOS TECLADO movimiento nave
-
-            elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_UP:
-                    player.changespeed(-2)
-                elif event.key == pg.K_DOWN:
-                    player.changespeed(2)
+        #Pintar marcador
+        texto_salida = '  Puntos ' + str(puntos) + '                   Nivel ' + str(nivel)
+        texto = fuente.render(texto_salida, True, BLANCO)
+        screen.blit(texto, [15,10])   
         
-            elif event.type == pg.KEYUP:
-                player.resetSpeed() #parar la nave
-    else:
-        player.resetSpeed()
-      
+        #Movemos la nave durante al nivel
+        if pausaJuego == False:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
 
-    all_sprite_list.update()
-    if finNivel == False:
-        meteor_hit_list = pg.sprite.spritecollide(player, meteor_list, True)
+            # EVENTOS TECLADO movimiento nave
+
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_UP:
+                        player.changespeed(-2)
+                    elif event.key == pg.K_DOWN:
+                        player.changespeed(2)
+            
+                elif event.type == pg.KEYUP:
+                    player.resetSpeed() #parar la nave
+        else:
+            player.resetSpeed()
+        
+
+        all_sprite_list.update()
+        
+        #gestión de colisiones
+        if pausaJuego == False:
+            meteor_hit_list = pg.sprite.spritecollide(player, meteor_list, True)
 
         for meteor in meteor_hit_list:
             score += 1
@@ -624,8 +534,146 @@ while not done:
             screen.blit(naveVidas, [500, 0])
         elif vidas == 0:
             muerto = True
+            juego = False
+        
+        
+
+        all_sprite_list.draw(screen)
+        pg.display.flip()
+        clock.tick(tasa_fotogramas)
+
+
+        #Control fin de nivel, se para la nave, se muestra el planeta
+        #if finNivel == False and mostPlaneta == False and muerto == False:
+        if pausaJuego == False:
+            #segundos_totales = instante_de_partida - (num_fotogramas // tasa_fotogramas)
+            segundos_totales = instante_de_partida - (cronometro // tasa_fotogramas)
+            cronometro += 1
+            if segundos_totales <0:
+                segundos_totales = 0
+            
+            if segundos_totales == 0:
+                mostPlaneta = True
+                pausaJuego = True
+                plan = Planeta()
+                all_sprite_list.add(plan)
+                cronometro = 0
+              
+   
+        if mostPlaneta == True:
+            cronometro += 1
+            tiempoEspera = 3* tasa_fotogramas
+            if cronometro >= tiempoEspera:
+                mostPlaneta = False
+                naveRotando = True
     
+    
+    
+        #if finNivel == True and mostPlaneta == False and naveRotando == True:
+        if naveRotando == True:
+            if contarGiro < 177:
+                contarGiro +=3
+                player.rotarNave()
+            elif contarGiro >= 177:
+                #naveRotando = False
+                aterrizar = True
+                
+            if aterrizar == True and player.aterrizar():
+                naveRotando = False
+                aterrizar = False
+                contarGiro = 0
+                faseFinal = True
+                naveRotando = False
+            
+
+    
+        #if finNivel == True and mostPlaneta == False and naveRotando == False:
+        if faseFinal == True:
+            if nivel <3:
+                finNivel = True
+                pausaJuego = True
+            else:
+                victoria = True
+                juego = False
+            faseFInal = False
+
+       
+        if finNivel == True:    
+            if nivel <3:
+                texto_salida = 'Nivel ' + str(nivel) + ' Finalizado!! PRESIONA ESPACIO PARA CONTINUAR' 
+                texto = fuente.render(texto_salida, True, BLANCO)
+                screen.blit(texto, [150,200])
+                pg.display.flip()
+            #if finNivel == True and mostPlaneta == False and muerto == False and victoria == False and naveRotando == False:
+        
+            while (finNivel == True):
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        finNivel = False
+                        pg.quit() 
+                    # EVENTOS TECLADO movimiento nave
+                    elif event.type == pg.KEYDOWN:
+                        if event.key == pg.K_SPACE:
+                            instante_de_partida = duraNivel
+                            cronometro = 0
+                            masMet = instante_de_partida - 3 #Cada cuanto se generan mas meteoritos (segundos)
+                            all_sprite_list.empty()   
+                            nivel += 1
+                            finNivel = False
+                            numMeteoritos += 3
+                            naveRotando = False
+                            faseFinal = False
+                            pausaJuego= False
+                            inicioNivel = True
+
+                            '''
+                            for i in range(numMeteoritos): # Creamos 2 asteroides
+                                meteor = Meteor()
+                                #meteor.rect.x = random.randrange(800)
+                                meteor.rect.x = 700 #TOdos empiezan en el margen derecho
+                                meteor.rect.y = random.randrange(600)
+                                meteor_list.add(meteor)
+                                all_sprite_list.add(meteor)    
+                                    
+                            player = Player()
+                            all_sprite_list.add(player)   
+                            '''
+    
+    if victoria == True:
+        background = pg.image.load("victoria.jpg").convert()
+        screen.blit(background, [0, 0])
+        pg.display.flip()
+        nuevoRecord(cur, puntos)
+        con.commit()
+        mostrarRecords(cur)
+
+        texto_salida = '¡¡Enhorabuena!! ¡¡Has conseguido ' + str(puntos) + ' puntos!!  '
+        texto = fuente.render(texto_salida, True, BLANCO)
+        screen.blit(texto, [150,300])
+
+        texto_salida = 'PRESIONA ENTER PARA CONTINUAR'
+        texto = fuente.render(texto_salida, True, BLANCO)
+        screen.blit(texto, [150, 300])
+        pg.display.flip()
+
+        while victoria == True:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    reiniciar = False
+                    pg.quit() 
+                # EVENTOS TECLADO movimiento nave
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        reiniciar = False
+                        inicio = True
+                        all_sprite_list.empty()
+                        victoria = False
+    
+    #gestión cuando no hay más vidas
     if muerto == True:
+        background = pg.image.load("shipCrash.jpg").convert()
+        screen.blit(background, [0, 0])
+        pg.display.flip()
         nuevoRecord(cur, puntos)
         con.commit()
         mostrarRecords(cur)
@@ -635,67 +683,20 @@ while not done:
         texto2 = fuente.render(texto_salida_2, True, BLANCO)
         screen.blit(texto, [120,270])
         screen.blit(texto2, [120, 300])
-
-    all_sprite_list.draw(screen)
-    pg.display.flip()
-    clock.tick(tasa_fotogramas)
- 
-    
-    if muerto == True or victoria == True:
-        reiniciar = True
-       
-    if reiniciar == True:
-         #APRETAMOS ESPACIO PARA CONTINUAR
-        while (reiniciar == True):
-             for event in pg.event.get():
+        pg.display.flip()
+        while muerto == True:
+            for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    reiniciar = False 
+                    reiniciar = False
+                    pg.quit() 
                 # EVENTOS TECLADO movimiento nave
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
                         reiniciar = False
                         inicio = True
                         all_sprite_list.empty()
-                        
-                        #guardar puntuacion
-                        #now=datetime.now()
-                        #date_timeSQL = now.strftime("%d/%m/%Y , %H:%M:%S")
-                        
-                        
+                        muerto = False
 
-
-
-
-
-
-
-    if finNivel == True and mostPlaneta == False and muerto == False and victoria == False and naveRotando == False:
-         #APRETEMOS ESPACIO PARA CONTINUAR
-        while (finNivel == True):
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    finNivel = False 
-                # EVENTOS TECLADO movimiento nave
-                elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_SPACE:
-                        instante_de_partida = 10
-                        cronometro = 0
-                        masMet = instante_de_partida - 3 #Cada cuanto se generan mas meteoritos (segundos)
-                        all_sprite_list.empty()   
-                        nivel += 1
-                        finNivel = False
-                        numMeteoritos += 3
-                        naveRotando = True
-                        
-                        for i in range(numMeteoritos): # Creamos 2 asteroides
-                            meteor = Meteor()
-                            #meteor.rect.x = random.randrange(800)
-                            meteor.rect.x = 700 #TOdos empiezan en el margen derecho
-                            meteor.rect.y = random.randrange(600)
-                            meteor_list.add(meteor)
-                            all_sprite_list.add(meteor)    
-                                
-                        player = Player()
-                        all_sprite_list.add(player)
+                
 
 pg.quit()
