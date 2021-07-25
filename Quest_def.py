@@ -33,11 +33,11 @@ class Meteor(pg.sprite.Sprite):
 
         randAst = random.randint(1,3)
         if randAst == 1:        
-            self.image = pg.image.load("Ast75.png").convert() # self.image es el nombre de la variable asteroide
+            self.image = pg.image.load("Media/Ast75.png").convert() # self.image es el nombre de la variable asteroide
         elif randAst == 2:
-            self.image = pg.image.load("Ast50.png").convert() # self.image es el nombre de la variable asteroide
+            self.image = pg.image.load("Media/Ast50.png").convert() # self.image es el nombre de la variable asteroide
         elif randAst == 3:
-            self.image = pg.image.load("Ast25.png").convert() # self.image es el nombre de la variable asteroide
+            self.image = pg.image.load("Media/Ast25.png").convert() # self.image es el nombre de la variable asteroide
 
         self.image.set_colorkey(BLANCO)
         self.rect = self.image.get_rect()  # Variable para poder posicionar al sprite
@@ -56,7 +56,7 @@ class Meteor(pg.sprite.Sprite):
 class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.image.load("Nave_95.png").convert()
+        self.image = pg.image.load("Media/Nave_95.png").convert()
         self.image.set_colorkey(NEGRO)
         self.rect = self.image.get_rect() 
         self.speed_x = 0
@@ -150,7 +150,7 @@ class Explosion(pg.sprite.Sprite):
     def __init__(self,center):
         
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load("Explosion120.png").convert() # self.image es el nombre de la variable asteroide
+        self.image = pg.image.load("Media/Explosion120.png").convert() # self.image es el nombre de la variable asteroide
         self.image.set_colorkey(NEGRO)
         self.rect = self.image.get_rect() 
         self.rect.center = center
@@ -168,7 +168,7 @@ class Explosion(pg.sprite.Sprite):
 class Planeta(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.image.load("Planeta2.png").convert() # self.image es el nombre de la variable asteroide
+        self.image = pg.image.load("Media/Planeta2.png").convert() # self.image es el nombre de la variable asteroide
         self.image.set_colorkey(NEGRO)
         self.rect = self.image.get_rect() 
         self.speed_x = -6
@@ -239,7 +239,7 @@ def menuInicio(baseD):
     
     #fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pantalla
     fuente = pg.font.Font("fuentes/titulo.otf", 42)   # fuente para el texto que aparece en pantalla
-    background = pg.image.load("nebula.jpeg").convert()
+    background = pg.image.load("Media/nebula.jpeg").convert()
     screen.blit(background, [0, 0])
     
     texto = fuente.render("Bienvenido/a a The Quest", True, BLANCO)
@@ -369,7 +369,7 @@ def nuevoRecord(baseD, puntos):
         baseD.execute("insert into tablaPuntos values (?,?,?)", (idBorrar,nombre,puntos))
         
 def fondoJuego():
-    background = pg.image.load("Fondo_espacio.jpg").convert()
+    background = pg.image.load("Media/Fondo_espacio.jpg").convert()
     screen.blit(background, [0, 0])
 
 
@@ -389,7 +389,7 @@ inicio = True
 
 #nivel = 1
 
-fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pantalla
+#fuente = pg.font.SysFont("Arial", 15)   # fuente para el texto que aparece en pantalla
 
 num_fotogramas = 0
 tasa_fotogramas = 30
@@ -403,7 +403,7 @@ cur = con.cursor()
 cur.execute("create table if not exists tablaPuntos (id, nombre, puntos)")
 
 
-sound = pg.mixer.Sound("explota.wav") #Variable para añadir sonido de explosión
+sound = pg.mixer.Sound("Media/explota.wav") #Variable para añadir sonido de explosión
 
 #background = pg.image.load("Fondo_espacio.jpg").convert()
 #screen.blit(background, [0, 0])
@@ -416,7 +416,7 @@ while not done:
         
     #Llamada a menu inicio
     while inicio == True:
-        background = pg.image.load("nebula.jpeg").convert()
+        background = pg.image.load("Media/nebula.jpeg").convert()
         screen.blit(background, [0, 0])
         menuInicio(cur)
         
@@ -532,20 +532,20 @@ while not done:
             all_sprite_list.add(expl)
 
         if vidas == 3:
-            naveVidas = pg.image.load("Nave_vidas.png").convert()
+            naveVidas = pg.image.load("Media/Nave_vidas.png").convert()
             naveVidas.set_colorkey(NEGRO)
             screen.blit(naveVidas, [500, 0])
             screen.blit(naveVidas, [530, 0])
             screen.blit(naveVidas, [560, 0])
         
         elif vidas == 2:
-            naveVidas = pg.image.load("Nave_vidas.png").convert()
+            naveVidas = pg.image.load("Media/Nave_vidas.png").convert()
             naveVidas.set_colorkey(NEGRO)
             screen.blit(naveVidas, [500, 0])
             screen.blit(naveVidas, [530, 0])
         
         elif vidas == 1:
-            naveVidas = pg.image.load("Nave_vidas.png").convert()
+            naveVidas = pg.image.load("Media/Nave_vidas.png").convert()
             naveVidas.set_colorkey(NEGRO)
             screen.blit(naveVidas, [500, 0])
         elif vidas == 0:
@@ -663,7 +663,7 @@ while not done:
                             '''
     
     if victoria == True:
-        background = pg.image.load("victoria.jpg").convert()
+        background = pg.image.load("Media/victoria.jpg").convert()
         screen.blit(background, [0, 0])
         pg.display.flip()
         #nuevoRecord(cur, puntos)
@@ -698,7 +698,7 @@ while not done:
         fuente = pg.font.Font("fuentes/muerto.ttf", 72)
         fuente2 = pg.font.Font("fuentes/texto.otf", 20)
         fuente3 = pg.font.Font("fuentes/muerto.ttf", 48)
-        background = pg.image.load("shipCrash.jpg").convert()
+        background = pg.image.load("Media/shipCrash.jpg").convert()
         screen.blit(background, [0, 0])
         pg.display.flip()
         #nuevoRecord(cur, puntos)
